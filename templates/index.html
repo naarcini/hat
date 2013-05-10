@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <link rel='shortcut icon' href='data:image/x-icon;,' type='image/x-icon' />
+        <title>Wear a Hat!</title>
+        <style type="text/css">
+            html, body { margin: 0; padding: 0; position: relative; height: 100%; width: 100%; }
+            #intro { height: 100%; width: 100%; background: #000; }
+            #intro img { text-align: center; display: block; height: 100%; margin: 0 auto; padding: 0; background: #000; cursor: pointer; }
+            canvas { margin: 0; padding: 0; display: block; }
+        </style>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animframe.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animations.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/sockjs.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/network.js"></script>
+        <script type="text/javascript">
+            var canvas, networking;
+
+            $(document).ready( function () {
+                var intro = $('<div>').attr('id', 'intro').append($('<img>').attr('src', '{{ STATIC_URL }}images/WAH_TITLE_MOCKUP.jpg'));
+                $('body').append(intro);
+
+                intro.on('click', function(e) {
+                    $(intro).hide();
+                    $('#hat-game').css('min-height', Math.min($(window).outerHeight()-1, 1250));
+                    $('#hat-game').css('min-width', Math.min($(window).outerWidth()-1, 1750));
+                    
+                    canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
+                    networking = new Networking(canvas);
+
+                    canvas.init();
+                    canvas.start();
+                    
+                    $('body').on('keydown', function(e) {
+                        var code = e.keyCode || e.which;
+                        canvas.move_start(code);
+                    });
+
+                    $('body').on('keyup', function(e) {
+                        var code = e.keyCode || e.which;
+                        canvas.move_stop(code);
+                    });
+                });
+                
+                
+            });
+        </script>
+    </head>
+    <body>
+        <img id="GUY1_IDLE_01" src="{{ STATIC_URL }}images/GUY1_IDLE_01.png" style="display: none;" />
+        <img id="GUY1_IDLE_02" src="{{ STATIC_URL }}images/GUY1_IDLE_02.png" style="display: none;" />
+        <img id="GUY1_IDLE_HAT_01" src="{{ STATIC_URL }}images/GUY1_IDLE_HAT_01.png" style="display: none;" />
+        <img id="GUY1_IDLE_HAT_02" src="{{ STATIC_URL }}images/GUY1_IDLE_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_01" src="{{ STATIC_URL }}images/GUY1_WALK_BACK_01.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_02" src="{{ STATIC_URL }}images/GUY1_WALK_BACK_02.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_HAT_01" src="{{ STATIC_URL }}images/GUY1_WALK_BACK_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_BACK_HAT_02" src="{{ STATIC_URL }}images/GUY1_WALK_BACK_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_01" src="{{ STATIC_URL }}images/GUY1_WALK_FRONT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_02" src="{{ STATIC_URL }}images/GUY1_WALK_FRONT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_HAT_01" src="{{ STATIC_URL }}images/GUY1_WALK_FRONT_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_FRONT_HAT_02" src="{{ STATIC_URL }}images/GUY1_WALK_FRONT_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_LEFT_01" src="{{ STATIC_URL }}images/GUY1_WALK_LEFT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_LEFT_02" src="{{ STATIC_URL }}images/GUY1_WALK_LEFT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_LEFT_HAT_01" src="{{ STATIC_URL }}images/GUY1_WALK_LEFT_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_LEFT_HAT_02" src="{{ STATIC_URL }}images/GUY1_WALK_LEFT_HAT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_RIGHT_01" src="{{ STATIC_URL }}images/GUY1_WALK_RIGHT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_RIGHT_02" src="{{ STATIC_URL }}images/GUY1_WALK_RIGHT_02.png" style="display: none;" />
+        <img id="GUY1_WALK_RIGHT_HAT_01" src="{{ STATIC_URL }}images/GUY1_WALK_RIGHT_HAT_01.png" style="display: none;" />
+        <img id="GUY1_WALK_RIGHT_HAT_02" src="{{ STATIC_URL }}images/GUY1_WALK_RIGHT_HAT_02.png" style="display: none;" />
+
+        <img id="GUY2_IDLE_01" src="{{ STATIC_URL }}images/GUY2_IDLE_01.png" style="display: none;" />
+        <img id="GUY2_IDLE_02" src="{{ STATIC_URL }}images/GUY2_IDLE_02.png" style="display: none;" />
+        <img id="GUY2_IDLE_HAT_01" src="{{ STATIC_URL }}images/GUY2_IDLE_HAT_01.png" style="display: none;" />
+        <img id="GUY2_IDLE_HAT_02" src="{{ STATIC_URL }}images/GUY2_IDLE_HAT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_BACK_01" src="{{ STATIC_URL }}images/GUY2_WALK_BACK_01.png" style="display: none;" />
+        <img id="GUY2_WALK_BACK_02" src="{{ STATIC_URL }}images/GUY2_WALK_BACK_02.png" style="display: none;" />
+        <img id="GUY2_WALK_BACK_HAT_01" src="{{ STATIC_URL }}images/GUY2_WALK_BACK_HAT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_BACK_HAT_02" src="{{ STATIC_URL }}images/GUY2_WALK_BACK_HAT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_FRONT_01" src="{{ STATIC_URL }}images/GUY2_WALK_FRONT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_FRONT_02" src="{{ STATIC_URL }}images/GUY2_WALK_FRONT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_FRONT_HAT_01" src="{{ STATIC_URL }}images/GUY2_WALK_FRONT_HAT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_FRONT_HAT_02" src="{{ STATIC_URL }}images/GUY2_WALK_FRONT_HAT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_LEFT_01" src="{{ STATIC_URL }}images/GUY2_WALK_LEFT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_LEFT_02" src="{{ STATIC_URL }}images/GUY2_WALK_LEFT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_LEFT_HAT_01" src="{{ STATIC_URL }}images/GUY2_WALK_LEFT_HAT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_LEFT_HAT_02" src="{{ STATIC_URL }}images/GUY2_WALK_LEFT_HAT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_RIGHT_01" src="{{ STATIC_URL }}images/GUY2_WALK_RIGHT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_RIGHT_02" src="{{ STATIC_URL }}images/GUY2_WALK_RIGHT_02.png" style="display: none;" />
+        <img id="GUY2_WALK_RIGHT_HAT_01" src="{{ STATIC_URL }}images/GUY2_WALK_RIGHT_HAT_01.png" style="display: none;" />
+        <img id="GUY2_WALK_RIGHT_HAT_02" src="{{ STATIC_URL }}images/GUY2_WALK_RIGHT_HAT_02.png" style="display: none;" />
+
+        <img id="GUY3_IDLE_01" src="{{ STATIC_URL }}images/GUY3_IDLE_01.png" style="display: none;" />
+        <img id="GUY3_IDLE_02" src="{{ STATIC_URL }}images/GUY3_IDLE_02.png" style="display: none;" />
+        <img id="GUY3_IDLE_HAT_01" src="{{ STATIC_URL }}images/GUY3_IDLE_HAT_01.png" style="display: none;" />
+        <img id="GUY3_IDLE_HAT_02" src="{{ STATIC_URL }}images/GUY3_IDLE_HAT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_BACK_01" src="{{ STATIC_URL }}images/GUY3_WALK_BACK_01.png" style="display: none;" />
+        <img id="GUY3_WALK_BACK_02" src="{{ STATIC_URL }}images/GUY3_WALK_BACK_02.png" style="display: none;" />
+        <img id="GUY3_WALK_BACK_HAT_01" src="{{ STATIC_URL }}images/GUY3_WALK_BACK_HAT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_BACK_HAT_02" src="{{ STATIC_URL }}images/GUY3_WALK_BACK_HAT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_FRONT_01" src="{{ STATIC_URL }}images/GUY3_WALK_FRONT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_FRONT_02" src="{{ STATIC_URL }}images/GUY3_WALK_FRONT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_FRONT_HAT_01" src="{{ STATIC_URL }}images/GUY3_WALK_FRONT_HAT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_FRONT_HAT_02" src="{{ STATIC_URL }}images/GUY3_WALK_FRONT_HAT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_LEFT_01" src="{{ STATIC_URL }}images/GUY3_WALK_LEFT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_LEFT_02" src="{{ STATIC_URL }}images/GUY3_WALK_LEFT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_LEFT_HAT_01" src="{{ STATIC_URL }}images/GUY3_WALK_LEFT_HAT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_LEFT_HAT_02" src="{{ STATIC_URL }}images/GUY3_WALK_LEFT_HAT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_RIGHT_01" src="{{ STATIC_URL }}images/GUY3_WALK_RIGHT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_RIGHT_02" src="{{ STATIC_URL }}images/GUY3_WALK_RIGHT_02.png" style="display: none;" />
+        <img id="GUY3_WALK_RIGHT_HAT_01" src="{{ STATIC_URL }}images/GUY3_WALK_RIGHT_HAT_01.png" style="display: none;" />
+        <img id="GUY3_WALK_RIGHT_HAT_02" src="{{ STATIC_URL }}images/GUY3_WALK_RIGHT_HAT_02.png" style="display: none;" />
+
+        <img id="Hat_pic" src="{{ STATIC_URL }}images/HAT.png" style="display: none;" />
+        <img id="game_background" src="{{ STATIC_URL }}images/HAT_Background.png" style="display: none;" />
+        <div id="hat-game">
+        </div>
+    </body>
+</html>
