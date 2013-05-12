@@ -26,15 +26,18 @@ class GameState(object):
 
     def dictify(self):
         players = {}
-        hat = {'owner': self.hat.owner, 'x': self.hat.position.x, 'y': self.hat.position.y}
+        hat = self.hat.dictify()
         for key, val in self.players.items():
             players[key] = val.dictify()
         return {'players': players, 'hat': hat}
 
 class Player(object):
+    # Guy types should be updated if new character models added
     guy_types = [1, 2, 3]
+
     def __init__(self, session_id):
         self.id = session_id
+        # Player initial spawn position
         self.position = Position(0, 0)
         self.movement = Movement(0, 0)
         self.character = choice(self.guy_types)
@@ -48,8 +51,12 @@ class Player(object):
 
 class Hat(object):
     def __init__(self):
+        # Initial starting position of hat defined here.
         self.position = Position(700, 700)
         self.owner = None
+
+    def dictify(self):
+        return {'owner': self.owner, 'x': self.position.x, 'y': self.position.y}
 
 class Position(object):
     def __init__(self, x, y):

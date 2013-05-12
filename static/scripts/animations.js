@@ -210,7 +210,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
 
     var that = this;
     this.network = null
-    this.hat = new Hat(null, 700, 700);
+    this.hat = new Hat(null, this.max_x, this.max_y);
 
     // Methods
     this.init = function() {
@@ -225,11 +225,13 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.xpos_img = this.background_width/2;
         this.ypos_img = this.background_height/2;
 
-        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat)
+        // dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy)
         this.your_dude = new dude("you", this.xpos, this.ypos, this.dx, this.dy, this.move_speed, 0, 1);
         //this.other_dudes["not_you"] = new dude("not_you", this.test_dude_x, 0, 10, 0, this.move_speed, 1);
         //this.hat = new Hat(null, 700, 700);
 
+        // A tile refers to the picture of a guy at a given position (ie idle, right foot forward)
+        // Switching tiles causes animation
         this.tile_num = 1;
         this.total_tiles = 2;
         this.frame_counter = 1;
@@ -314,6 +316,7 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         if( !this.hat.get_owner() ) {
             this.draw_object(this.hat);
         }
+        
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat, guy) {
@@ -354,15 +357,31 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             draw_locations.push([draw_x, draw_y])
         }
         else {
-            if( Math.abs(x_off) < this.context.width/2 && Math.abs(y_off) < this.context.height/2) {
+            if( Math.abs(x_off) < this.context.width/2 ) {
                 draw_x = this.context.width/2 - img_width/2 + x_off;
-                draw_y = this.context.height/2 - img_height/2 - y_off;
-                draw_locations.push([draw_x, draw_y]);
+
+                if( Math.abs(y_off) < this.context.height/2 ) {
+                    draw_y = this.context.height/2 - img_height/2 - y_off;
+                    draw_locations.push([draw_x, draw_y]);
+                }
+
+                if( Math.abs(y_off_other) < this.context.height/2 ) {
+                    draw_y = this.context.height/2 - img_height/2 - y_off_other;
+                    draw_locations.push([draw_x, draw_y]);
+                }
             }
-            if( Math.abs(x_off_other) < this.context.width/2 && Math.abs(y_off_other) < this.context.height/2) {
+            if( Math.abs(x_off_other) < this.context.width/2 ) {
                 draw_x = this.context.width/2 - img_width/2 + x_off_other;
-                draw_y = this.context.height/2 - img_height/2 - y_off_other;
-                draw_locations.push([draw_x, draw_y]);
+
+                if( Math.abs(y_off) < this.context.height/2 ) {
+                    draw_y = this.context.height/2 - img_height/2 - y_off;
+                    draw_locations.push([draw_x, draw_y]);
+                }
+
+                if( Math.abs(y_off_other) < this.context.height/2 ) {
+                    draw_y = this.context.height/2 - img_height/2 - y_off_other;
+                    draw_locations.push([draw_x, draw_y]);
+                }
             }
         }
 
