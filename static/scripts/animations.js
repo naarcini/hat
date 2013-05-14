@@ -407,24 +407,36 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             // Down
             this.dy = this.move_speed;
         }
+
+        if( this.dx != 0 && this.dy != 0 ) {
+            this.dx = this.dx > 0 ? this.move_speed / 2 : -this.move_speed / 2;
+            this.dy = this.dy > 0 ? this.move_speed / 2 : -this.move_speed / 2;
+        }
     }
 
     this.move_stop = function( keyCode ) {
-        if( keyCode == 37 && this.dx == -this.move_speed ) {
+        if( keyCode == 37 && this.dx < 0 ) {
             // Left
             this.dx = 0;
         }
-        else if( keyCode == 38 && this.dy == -this.move_speed ) {
+        else if( keyCode == 38 && this.dy < 0 ) {
             // Up
             this.dy = 0;
         }
-        else if( keyCode == 39 && this.dx == this.move_speed ) {
+        else if( keyCode == 39 && this.dx > 0 ) {
             // Right
             this.dx = 0;
         }
-        else if( keyCode == 40 && this.dy == this.move_speed ) {
+        else if( keyCode == 40 && this.dy > 0 ) {
             // Down
             this.dy = 0;
+        }
+
+        if( this.dx != 0 ) {
+            this.dx = this.dx > 0 ? this.move_speed : -this.move_speed ;
+        }
+        if( this.dy != 0 ) {
+            this.dy = this.dy > 0 ? this.move_speed : -this.move_speed ;
         }
     }
 
