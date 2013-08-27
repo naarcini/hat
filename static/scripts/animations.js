@@ -48,6 +48,7 @@ function Hat(owner, xpos, ypos) {
     this.owner = owner;
     this.xpos = xpos;
     this.ypos = ypos;
+    this.message = null;
 
     this.get_image = function( tile_num ) {
         return $('#Hat_pic');
@@ -74,6 +75,10 @@ function Hat(owner, xpos, ypos) {
             this.owner = owner;
         }
     }
+
+    this.get_message = function() {
+        return this.message;
+    }
 }
 
 function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy) {
@@ -86,6 +91,7 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy) {
     this.move_speed = move_speed;
     this.has_hat = has_hat;
     this.guy = guy;
+    this.message = null;
 
     // Methods
     this.get_image = function( tile_num ) {
@@ -156,6 +162,14 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy) {
         return this.guy;
     }
 
+    this.get_message = function() {
+        return this.message;
+    }
+
+    this.set_message = function(message) {
+        this.message = message;
+    }
+
 /*
     talk = function( ctx, width, height, text ) {
         var x = xpos + dude_size + 5;
@@ -207,6 +221,8 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.dy = 0;
     this.move_speed = move_speed;
     this.other_dudes = {};
+    this.messageTimeout = 500;
+    this.messageCounter = 0;
 
     var that = this;
     this.network = null
@@ -267,10 +283,18 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         this.update_hat();
 
         // Send information
-        var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos, 'dx': this.dx, 'dy': this.dy, 'hat_owner': this.your_dude.get_hat_status()}});
+        var json_message = JSON.stringify({'action': 'move', 'body': {'session': window.session_id, 'x': this.xpos, 'y': this.ypos, 'dx': this.dx, 'dy': this.dy, 'hat_owner': this.your_dude.get_hat_status(), 'speech': this.your_dude.get_message()}});
         if(this.network !== null) {
             //console.log(json_message);
             this.network.send(json_message);
+        }
+
+        if( this.your_dude.get_message() != null && this.messageCounter < this.messageTimeout) {
+            this.messageCounter++;
+        }
+        else if( this.messageCounter >= this.messageTimeout ) {
+            this.messageCounter = 0;
+            this.your_dude.set_message(null);
         }
 
         // Draw player
@@ -328,11 +352,17 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         return dude;
     }
 
+    this.add_message = function(message) {
+        this.messageCounter = 0;
+        this.your_dude.set_message(message);
+    };
+
     this.draw_object = function(object) {
-        var image_jq, img, img_height, img_width, obj_x, obj_y, x_off, x_off_other, y_off, y_off_other;
+        var image_jq, img, img_height, img_width, obj_x, obj_y, x_off, x_off_other, y_off, y_off_other, message;
         var draw_locations = new Array();
         obj_x = object.get_position()[0];
         obj_y = object.get_position()[1];
+        message = object.get_message();
 
         if( false ) {
             console.log([object.get_position()[0], object.get_position()[1], this.xpos, this.ypos]);
@@ -387,6 +417,59 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
 
         for( var i=0; i<draw_locations.length; i++ ) {
             this.context.drawImage(img, draw_locations[i][0], draw_locations[i][1], img_width, img_height);
+            if( message != null && message != '' ) {
+                // Speech bubble
+                var x = draw_locations[i][0] + img_width;
+                var y = draw_locations[i][1] + 20;
+
+                var curvy_width = 20;
+                var curvy_height = 20;
+                var curviness = 10;
+                var width = 150;
+                var height = 90;
+                var radius = 10;
+
+                var rect_x = x + curvy_width/2 - width/2;
+                var rect_y = y - curvy_height - height;
+
+                // Draw curvy part
+                this.context.beginPath();
+                this.context.moveTo(x, y-curvy_height);
+                this.context.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x, y);
+                this.context.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x+curvy_height, y-curvy_height);
+
+                // Draw Rectangular part
+                this.context.lineTo(rect_x+width-radius, rect_y+height);
+                this.context.quadraticCurveTo(rect_x+width, rect_y+height, rect_x+width, rect_y+height-radius);
+                this.context.lineTo(rect_x+width, rect_y+radius);
+                this.context.quadraticCurveTo(rect_x+width, rect_y, rect_x+width-radius, rect_y);
+                this.context.lineTo(rect_x+radius, rect_y);
+                this.context.quadraticCurveTo(rect_x, rect_y, rect_x, rect_y+radius);
+                this.context.lineTo(rect_x, rect_y+height-radius);
+                this.context.quadraticCurveTo(rect_x, rect_y+height, rect_x+radius, rect_y+height);
+                this.context.lineTo(rect_x+width/2-curvy_width/2, rect_y+height);
+                
+                this.context.closePath();
+                this.context.fillStyle = "#FFF";
+                this.context.fill();
+                this.context.stroke();
+
+                this.context.fillStyle = "#000";
+                this.context.font = "normal 10pt Calibri";
+
+                var letters = message.split('');
+                var fragment = letters[0];
+                var line = 0;
+                for(var i=1; i<letters.length; i++) {
+                    fragment = fragment+letters[i];
+                    if( i % 20 == 0 ) {
+                        this.context.fillText(fragment, rect_x+10, rect_y+15+line*12);
+                        fragment = "";
+                        line++;
+                    }
+                }
+                this.context.fillText(fragment, rect_x+10, rect_y+15+line*12);
+            }
         }
     }
 
@@ -432,10 +515,10 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             this.dy = 0;
         }
 
-        if( this.dx != 0 ) {
+        if( this.dx != 0 && this.dy == 0 ) {
             this.dx = this.dx > 0 ? this.move_speed : -this.move_speed ;
         }
-        if( this.dy != 0 ) {
+        if( this.dy != 0 && this.dx == 0 ) {
             this.dy = this.dy > 0 ? this.move_speed : -this.move_speed ;
         }
     }
@@ -774,5 +857,58 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.stop = function() {
         this.state = 'stopped';
         cancelAnimFrame(this.anim_frame);
+    }
+}
+
+function speech(character_limit) {
+    this.listening = false;
+    this.character_limit = character_limit;
+
+    this.handle = function(code) {
+        if( code == 13 ) {
+            this.trigger();
+            return true;
+        }
+
+        // Some character
+        if( code == 32 || (code >= 32 ) ) {
+            //console.log(code, String.fromCharCode(code));
+        }
+        // Backspace
+        else if ( code == 8 ) {
+            //console.log("Backspace");
+        }
+    }
+
+    this.trigger = function() {
+        // Toggle listening
+        this.listening = !this.listening;
+        //console.log(this.listening);
+
+        // Start listening to keyboard input
+        if( this.listening ) {
+            this.display_prompt();
+            $('#speech_prompt_form').find('input[type="text"]').focus();
+        }
+        else {
+            this.remove_prompt();
+        }
+        return true;
+    }
+
+    this.display_prompt = function() {
+        var prompt = '' +
+            '<div id="speech_prompt" style="background-color: #000; opacity: 0.6; z-index: 1000; top: 70%; width: 100%; height: 50px; position: absolute;">' +
+            '<form action="." id="speech_prompt_form" style="opacity: 1; z-index: 2000; position: relative; top: 20%;">' +
+            '<input type="text" maxlength="'+this.character_limit.toString()+'" style="position: relative; left: 2%; width: 90%;"></input>' +
+            '<input type="submit" style="display: none;"></submit>' +
+            '</form></div>';
+
+        $('body').append(prompt);
+    }
+
+    this.remove_prompt = function() {
+        $('#speech_prompt').remove();
+        return true;
     }
 }

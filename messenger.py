@@ -31,11 +31,13 @@ class Connection(SockJSConnection):
             dx = message['body']['dx']
             dy = message['body']['dy']
             hat_owner = 0
+            speech = message['body']['speech']
             if message['body'].has_key('hat_owner'):
                 hat_owner = int(message['body']['hat_owner'])
 
             self.game_state.players[player].position.update(x, y)
             self.game_state.players[player].movement.update(dx, dy)
+            self.game_state.players[player].speech = speech;
             if hat_owner:
                 try:
                     self.game_state.assign_hat(player);

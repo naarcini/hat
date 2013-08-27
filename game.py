@@ -41,13 +41,14 @@ class Player(object):
         self.position = Position(0, 0)
         self.movement = Movement(0, 0)
         self.character = choice(self.guy_types)
+        self.speech = None;
 
     def move(self, x, y, dx, dy):
         self.position.update(x, y)
         self.movement.update(dx, dy)
 
     def dictify(self):
-        return {'id': self.id, 'position': {'x': self.position.x, 'y': self.position.y}, 'character': self.character, 'movement': {'dx': self.movement.dx, 'dy': self.movement.dy}}
+        return {'id': self.id, 'position': {'x': self.position.x, 'y': self.position.y}, 'character': self.character, 'movement': {'dx': self.movement.dx, 'dy': self.movement.dy}, 'speech': self.speech}
 
 class Hat(object):
     def __init__(self):

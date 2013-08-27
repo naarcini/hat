@@ -27,16 +27,18 @@ function Networking(game) {
             // update positions of existing players
             $.each(state.players, function(session, player) {
                 if(session != window.session_id) {
-                    var has_hat = 0 | (hat_owner == session);
+                    var has_hat = (hat_owner == session);
                     if(session in that.game.other_dudes && that.game.other_dudes[session]) {
                         that.game.update_dude(that.game.other_dudes[session], player.position.x, player.position.y, player.movement.dx, player.movement.dy, has_hat, player.character);
+                        that.game.other_dudes[session].set_message(player.speech);
                     } else {
                         that.game.other_dudes[session] = new dude(session, 0, 0, 0, 0, that.game.move_speed, 0, player.character);
                         console.log('Added player ' + session);
                     }
                 }
                 else {
-                    that.game.update_dude(that.game.your_dude, player.position.x, player.position.y, player.movement.dx, player.movement.dy, that.game.your_dude.get_hat_status(), player.character);
+                    //that.game.update_dude(that.game.your_dude, player.position.x, player.position.y, player.movement.dx, player.movement.dy, that.game.your_dude.get_hat_status(), player.character);
+                   //that.game.your_dude.set_message(player.speech);
                 }
             });
 

@@ -14,9 +14,8 @@
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/animations.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/sockjs.min.js"></script>
         <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/network.js"></script>
-        <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}scripts/speech.js"></script>
         <script type="text/javascript">
-            var canvas, networking;
+            var canvas, networking, speech;
 
             $(document).ready( function () {
                 var intro = $('<div>').attr('id', 'intro').append($('<img>').attr('src', '{{ STATIC_URL }}images/WAH_TITLE_MOCKUP.jpg'));
@@ -28,6 +27,7 @@
                     $('#hat-game').css('min-width', Math.min($(window).outerWidth()-1, 1750));
                     
                     canvas = new gameCanvas($('#hat-game'), 0, 0, 10, 1000, 1000);
+                    speech = new speech(140);
                     networking = new Networking(canvas);
 
                     canvas.init();
@@ -42,15 +42,15 @@
                         var code = e.keyCode || e.which;
                         canvas.move_stop(code);
 
-                        if( code == 13 ) {
-                            var message = $('body').speech('trigger');
-                            if( message ) {
-                                console.log("make bubble: " + message.toString());
-                            }
-                        }
+                        speech.handle(code);
                     });
                 });
-                
+
+
+                $('body').on('submit', '#speech_prompt_form', function(e) {
+                    e.preventDefault();
+                    canvas.add_message($('#speech_prompt_form').find('input[type="text"]').val());
+                });
                 
             });
         </script>
