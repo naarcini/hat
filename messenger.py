@@ -25,7 +25,13 @@ class Connection(SockJSConnection):
     def on_message(self, text):
         message = json.loads(text)
         if message['action'] == 'move':
-            player = message['body']['session']
+            try:
+                player = message['body']['session']
+            except KeyError:
+                self.debug()
+                self.send_obj('ack', {})
+                return
+
             x = message['body']['x']
             y = message['body']['y']
             dx = message['body']['dx']

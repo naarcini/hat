@@ -169,41 +169,6 @@ function dude(player_id, xpos, ypos, dx, dy, move_speed, has_hat, guy) {
     this.set_message = function(message) {
         this.message = message;
     }
-
-/*
-    talk = function( ctx, width, height, text ) {
-        var x = xpos + dude_size + 5;
-        var y = ypos - 5;
-
-        var curvy_width = 20;
-        var curvy_height = 20;
-        var curviness = 10;
-
-        // Draw curvy part
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x, y-curvy_height);
-        ctx.moveTo(x, y);
-        ctx.quadraticCurveTo(x+curvy_width/2+curviness, y-curvy_height/2, x+curvy_height, y-curvy_height);
-        
-        //Draw Rectangular part
-        var rect_x = x + curvy_width/2 - width/2;
-        var rect_y = y - curvy_height - height;
-
-        ctx.moveTo(rect_x, rect_y+radius);
-        ctx.lineTo(rect_x, rect_y+height-radius);
-        ctx.quadraticCurveTo(rect_x, rect_y+height, rect_x+radius, rect_y+height);
-        ctx.lineTo(rect_x+width/2-curvy_width/2, rect_y+height);
-        ctx.moveTo(rect_x+width/2+curvy_width/2, rect_y+height);
-        ctx.lineTo(rect_x+width-radius, rect_y+height);
-        ctx.quadraticCurveTo(rect_x+width, rect_y+height, rect_x+width, rect_y+height-radius);
-        ctx.lineTo(rect_x+width, rect_y+radius);
-        ctx.quadraticCurveTo(rect_x+width, rect_y, rect_x+width-radius, rect_y);
-        ctx.lineTo(rect_x+radius, rect_y);
-        ctx.quadraticCurveTo(rect_x, rect_y, rect_x, rect_y+radius);
-        ctx.stroke();
-    }
-    */
     
 
 }
@@ -223,6 +188,8 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
     this.other_dudes = {};
     this.messageTimeout = 500;
     this.messageCounter = 0;
+    this.idleTimeout = 1000;
+    this.idleTimer = 0;
 
     var that = this;
     this.network = null
@@ -296,6 +263,11 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             this.messageCounter = 0;
             this.your_dude.set_message(null);
         }
+        
+        this.idleTimer++;
+        if ( this.idleTimer >= this.idleTimeout ) {
+            location.reload(true);
+        }
 
         // Draw player
         this.draw_object(this.your_dude);
@@ -329,18 +301,10 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
                 this.hat.set_owner(window.session_id);
                 this.your_dude.set_hat_status(1);
             }
+            else {
+                this.draw_object(this.hat);
+            }
         }
-        else if ( this.hat.get_owner() != window.session_id ){
-            this.your_dude.set_hat_status(0);
-        }
-        else {
-            this.hat.set_position(this.your_dude.get_position()[0], this.your_dude.get_position()[1]);
-        }
-
-        if( !this.hat.get_owner() ) {
-            this.draw_object(this.hat);
-        }
-        
     }
 
     this.update_dude = function(dude, xpos, ypos, dx, dy, has_hat, guy) {
@@ -495,6 +459,9 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
             this.dx = this.dx > 0 ? this.move_speed / 2 : -this.move_speed / 2;
             this.dy = this.dy > 0 ? this.move_speed / 2 : -this.move_speed / 2;
         }
+
+        this.idleTimer = 0;
+
     }
 
     this.move_stop = function( keyCode ) {
@@ -521,6 +488,9 @@ function gameCanvas(jq_elem, xpos, ypos, move_speed, max_x, max_y) {
         if( this.dy != 0 && this.dx == 0 ) {
             this.dy = this.dy > 0 ? this.move_speed : -this.move_speed ;
         }
+
+        this.idleTimer = 0;
+
     }
 
     this.change_speed = function( speed ) {
@@ -870,20 +840,11 @@ function speech(character_limit) {
             return true;
         }
 
-        // Some character
-        if( code == 32 || (code >= 32 ) ) {
-            //console.log(code, String.fromCharCode(code));
-        }
-        // Backspace
-        else if ( code == 8 ) {
-            //console.log("Backspace");
-        }
     }
 
     this.trigger = function() {
         // Toggle listening
         this.listening = !this.listening;
-        //console.log(this.listening);
 
         // Start listening to keyboard input
         if( this.listening ) {

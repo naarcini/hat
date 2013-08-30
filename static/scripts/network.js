@@ -46,6 +46,7 @@ function Networking(game) {
             $.each(that.game.other_dudes, function(session, player) {
                 if(!(session in state.players)) {
                     if( hat_owner == session ) {
+                        that.game.hat.set_position(that.game.other_dudes[session].get_position()[0], that.game.other_dudes[session].get_position()[1]);
                         that.game.hat.set_owner(0);
                     }
                     delete that.game.other_dudes[session];
